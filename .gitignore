@@ -4,3 +4,4 @@ __pycache_
 .DS_Store
 .env
 .vscode/*
+*.db
