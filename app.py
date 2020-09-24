@@ -48,19 +48,23 @@ def forge():
     db.session.commit()
     click.echo('Done.')
 
+@app.context_processor
+def inject_user():  # 函数名可以随意修改
+    user = User.query.first()
+    return dict(user=user)  # 需要返回字典，等同于 return {'user': user}
+
 @app.route("/")
 def index():
-    user = User.query.first()  # 读取用户记录
     movies = Movie.query.all()  # 读取所有电影记录
-    return render_template('index.html', user=user, movies=movies)
+    return render_template('index.html', movies=movies)
 
 @app.route("/root_path")
 def root_path():
     return app.root_path
 
-@app.route("/<name>")
-def hello(name):
-    return '{}, Welcome to my watchlist!\n<h1>Hello Totoro!</h1><img src="http://helloflask.com/totoro.gif">'.format(escape(name))
+# @app.route("/<name>")
+# def hello(name):
+#     return '{}, Welcome to my watchlist!\n<h1>Hello Totoro!</h1><img src="http://helloflask.com/totoro.gif">'.format(escape(name))
 
 @app.route('/test_url')
 def test_url_for():
@@ -74,6 +78,9 @@ def test_url_for():
     print(url_for('test_url_for', num=2))  # 输出：/test_url?num=2
     return 'Test URL page'
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
 
 class User(db.Model):  # 表名将会是 user（自动生成，小写处理）
     id = db.Column(db.Integer, primary_key=True)  # 主键
